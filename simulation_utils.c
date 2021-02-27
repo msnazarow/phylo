@@ -8,8 +8,7 @@ unsigned int time_has_left(struct timeval *started)
     gettimeofday(&now, NULL);
     difference.tv_sec = now.tv_sec - started->tv_sec;
     difference.tv_usec = now.tv_usec - started->tv_usec;
-    gettimeofday(started, NULL);
-    return (difference.tv_usec);//в микросекундах
+    return (difference.tv_usec/1000 + difference.tv_sec * 1000);//в микросекундах
 }
 
 void    phylo_death(t_arguments *args)
@@ -23,7 +22,7 @@ void    print_local_time()
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    printf("%ld.%06d ", tv.tv_sec % 100, tv.tv_usec);
+    printf("%ld ", tv.tv_sec * 1000 + tv.tv_usec/1000);
 
 }
 

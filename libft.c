@@ -3,13 +3,13 @@
 void ft_sleep(unsigned int i) //принимает микросекунды
 {
     struct timeval tv1, tv2;
+	size_t time;
     gettimeofday(&tv1, NULL);
-    tv1.tv_usec += i;
-    while (1)
+    time = tv1.tv_sec * 1000 + tv1.tv_usec / 1000 + i;
+    while (time >= tv2.tv_sec * 1000 + tv2.tv_usec / 1000)
     {
-        gettimeofday(&tv2, NULL);
-        if (tv2.tv_usec >= tv1.tv_usec)
-            return;
+        usleep(i * 0.9);
+		gettimeofday(&tv2, NULL);
     }
 }
 int	ft_isdigit(int c)

@@ -78,6 +78,7 @@ void simulate(t_arguments **args)
 {
 	int i;
 	int status_addr;
+	int dead = 0;
 	struct timeval tv_start;
 	
 	gettimeofday(&tv_start, NULL);
@@ -86,34 +87,39 @@ void simulate(t_arguments **args)
 	{
 		args[i]->last_meal_time = &tv_start;
 		int result = pthread_create(&args[i]->thread, NULL, hello, args[i]);
-		pthread_detach(args[i]->thread);
 		i++;
 	}
 	i = 0;
-	while (i < args[0]->number_of_phylo)
-	{		
-		if (time_has_left(args[i]->last_meal_time) * 1000 > args[i]->ttd)
-			phylo_death(args[i]);		
-		//pthread_join(args[i]->thread, (void*)&status_addr);
-		i++;
+	while (!dead) 
+	{
+		while (i < args[0]->number_of_phylo)
+		{		
+			if (time_has_left(args[i]->last_meal_time) > args[i]->ttd)
+				{ 
+					dead = 1;
+					phylo_death(args[i]);
+
+				}		
+			i++;
+		}
+		i = 0;
 	}
 }
 
 void *hello(void *v_args)
 {
+	struct timeval tmp;
 	t_arguments *args = v_args;
 	if (args->phylo_index % 2 == 0)
-		ft_sleep(800);
+	 	ft_sleep(args->tts * 0.9);
 	 while (1)
 	 {
     	pthread_mutex_lock(args->one);
-		print_local_time();
-		printf("phylo %d has taken a left fork\n", args->phylo_index);
+		print_local_time(); printf("phylo %d has taken a left fork\n", args->phylo_index);
 		pthread_mutex_lock(args->two);
-		print_local_time();
-		printf("phylo %d has taken two forks\n", args->phylo_index);
-		print_local_time();
-		printf("phylo %d is eating\n", args->phylo_index);
+		print_local_time(); printf("phylo %d has taken two forks\n", args->phylo_index);
+		update_last_meal_time(args, &tmp);
+		print_local_time(); printf("phylo %d is eating\n", args->phylo_index);
 		ft_sleep(args->tte * 1000);
 		++args->meals_total;
 		pthread_mutex_unlock(args->one);
