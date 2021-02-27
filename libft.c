@@ -1,6 +1,6 @@
 #include "phylo.h"
 
-void ft_sleep(unsigned int i) 
+void ft_sleep(unsigned int i) //принимает микросекунды
 {
     struct timeval tv1, tv2;
     gettimeofday(&tv1, NULL);

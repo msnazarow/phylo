@@ -67,7 +67,7 @@ t_arguments **init_phylos(t_arguments *info)
 		args[i]->thread = malloc(sizeof(pthread_t));
 		args[i]->one = &info->mutex_array[i];
 		args[i]->two = i + 1 == info->number_of_phylo ? &info->mutex_array[0] : &info->mutex_array[i + 1];
-		args[i]->phylo_index = i;
+		args[i]->phylo_index = i + 1;
 		args[i]->meals_total = 0;
 		++i;
 	}
@@ -92,7 +92,7 @@ void simulate(t_arguments **args)
 	i = 0;
 	while (i < args[0]->number_of_phylo)
 	{		
-		if (time_has_left(args[i]->last_meal_time) > args[i]->ttd)
+		if (time_has_left(args[i]->last_meal_time) * 1000 > args[i]->ttd)
 			phylo_death(args[i]);		
 		//pthread_join(args[i]->thread, (void*)&status_addr);
 		i++;
@@ -103,23 +103,25 @@ void *hello(void *v_args)
 {
 	t_arguments *args = v_args;
 	if (args->phylo_index % 2 == 0)
-		ft_sleep(args->ttd * 0.9);
+		ft_sleep(800);
 	 while (1)
 	 {
-		pthread_mutex_lock(args->one);
+    	pthread_mutex_lock(args->one);
+		print_local_time();
+		printf("phylo %d has taken a left fork\n", args->phylo_index);
 		pthread_mutex_lock(args->two);
 		print_local_time();
-		printf("phylo %d has taken forks\n", args->phylo_index);
+		printf("phylo %d has taken two forks\n", args->phylo_index);
 		print_local_time();
 		printf("phylo %d is eating\n", args->phylo_index);
-		ft_sleep(args->tte);
+		ft_sleep(args->tte * 1000);
 		++args->meals_total;
 		pthread_mutex_unlock(args->one);
 		pthread_mutex_unlock(args->two);
 
 		print_local_time();
 		printf("phylo %d is sleeping\n", args->phylo_index);
-		ft_sleep(args->tts);
+		ft_sleep(args->tts * 1000);
 
 		print_local_time();
 		printf("phylo %d is thinking\n", args->phylo_index);
