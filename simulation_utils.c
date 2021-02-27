@@ -9,7 +9,7 @@ unsigned int time_has_left(struct timeval *started)
     difference.tv_sec = now.tv_sec - started->tv_sec;
     difference.tv_usec = now.tv_usec - started->tv_usec;
     gettimeofday(started, NULL);
-    return (difference.tv_usec);
+    return (difference.tv_usec);//в микросекундах
 }
 
 void    phylo_death(t_arguments *args)
@@ -41,4 +41,10 @@ void phylo_eat(t_arguments * args)
 		++args->meals_total;
 		pthread_mutex_unlock(args->one);
 		pthread_mutex_unlock(args->two);
+}
+
+void update_last_meal_time(t_arguments *args, struct timeval *tv) 
+{
+	gettimeofday(tv, NULL);
+	args->last_meal_time = tv;
 }
